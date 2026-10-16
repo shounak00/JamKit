@@ -1,0 +1,44 @@
+# Unity generated
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# IDEs
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.sln
+*.slnx
+*.suo
+*.user
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Builds / exports
+*.apk
+*.aab
+*.unitypackage
+*.app
+/Release/
+
+# Mixamo: never publish raw Mixamo files (Adobe forbids redistribution).
+# The folder itself and its README stay in the repo; everything else in it is ignored.
+/Assets/JamKit/_MixamoDropZone/*
+!/Assets/JamKit/_MixamoDropZone/_README.txt
+!/Assets/JamKit/_MixamoDropZone/_README.txt.meta

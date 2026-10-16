@@ -1,0 +1,39 @@
+JamKit v1.0 — Credits and licences
+==================================
+
+Code
+----
+JamKit scripts (Assets/JamKit/Scripts) — MIT License, (c) 2026 Shounak Sobahani. See LICENSE.
+
+Placeholder art and sound shipped in this version
+-------------------------------------------------
+All sprites in Assets/JamKit/Art/2D (spr_*.png) and all sounds in Assets/JamKit/Audio (sfx_*.wav)
+are generated procedurally by JamKit's own builder script (JamKitBuilder). They are released
+under CC0 1.0 (public domain): use them anywhere, no credit required.
+
+Fonts
+-----
+LiberationSans SDF (TextMeshPro Essentials) — SIL Open Font License 1.1, shipped by Unity.
+
+Third-party CC0 art and sound (Art/2D/Override, Audio/Override)
+----------------------------------------------------------------
+All by Kenney (www.kenney.nl), Creative Commons Zero (CC0 1.0). Credit not required; thank you Kenney!
+  - Pixel Platformer (1.2)  — https://kenney.nl/assets/pixel-platformer  (platformer tiles, coin, key, heart,
+                               spikes, flag, door, sign, player, enemy)
+  - Tiny Dungeon            — https://kenney.nl/assets/tiny-dungeon      (top-down walls, floor, knight, slime, statue)
+  - Digital Audio           — https://kenney.nl/assets/digital-audio     (jump, coin, shoot, lose)
+  - Impact Sounds           — https://kenney.nl/assets/impact-sounds     (hurt, stomp)
+  - Interface Sounds        — https://kenney.nl/assets/interface-sounds  (door, checkpoint)
+  - Music Jingles           — https://kenney.nl/assets/music-jingles     (win)
+Parallax hills and clouds, the 3D blockout materials and the placeholder 3D character are JamKit's own (CC0).
+
+Mixamo
+------
+No Mixamo files are included in this kit. If your game uses a Mixamo character or animation,
+credit "Character/animations from Mixamo (Adobe)" on your game page.
+Never redistribute the raw Mixamo FBX files.
+
+Using JamKit in a jam game
+--------------------------
+You may ship games made with JamKit freely. Please disclose it as a pre-made asset, e.g.:
+  "Made with JamKit by Shounak Sobahani (MIT) — github.com/shounak00/JamKit"

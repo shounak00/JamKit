@@ -1,0 +1,1 @@
+Your art goes here (sprites, models, textures). Never inside JamKit/.

@@ -1,0 +1,1 @@
+Put a CC0 humanoid character FBX here (see Docs/ASSETS_TODO.md). Rebuild Kit Content uses the first one it finds as the 3D player's model.

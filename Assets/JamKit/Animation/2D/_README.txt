@@ -1,0 +1,1 @@
+Sprite frame sets for JamSpriteSwapper go here (or in _Game/Art).

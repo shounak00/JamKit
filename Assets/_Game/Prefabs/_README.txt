@@ -1,0 +1,1 @@
+Your prefab variants go here: right-click a JamKit prefab → Create → Prefab Variant, then move it here.

@@ -1,0 +1,1 @@
+UI sprites (buttons, panels, icons). The kit's HUD uses spr_heart and spr_diamond from Art/2D and Unity's built-in UI sprite.
