@@ -128,6 +128,15 @@ namespace JamKit.EditorTools
 
             // 1+3. Animation FBX: copy the avatar, loop + bake-into-pose settings
             var clipsByState = new Dictionary<string, AnimationClip>();
+            var clipSpeeds = new Dictionary<string, float>();
+            // A hidden copy of the character to play clips on and watch where its feet are
+            var rig = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(character));
+            rig.hideFlags = HideFlags.HideAndDontSave;
+            var rigAnimator = rig.GetComponent<Animator>();
+            if (rigAnimator == null) rigAnimator = rig.AddComponent<Animator>();
+            rigAnimator.avatar = avatar;
+            try
+            {
             foreach (var path in anims)
             {
                 var imp = (ModelImporter)AssetImporter.GetAtPath(path);
@@ -159,12 +168,45 @@ namespace JamKit.EditorTools
                     r.AppendLine($"⚠️ {Path.GetFileName(path)}: name doesn't say which move it is (idle, walk, run, jump, fall, land…). Skipped.");
                     continue;
                 }
-                if (!clipsByState.ContainsKey(state)) clipsByState[state] = clip;
+                if (clipsByState.ContainsKey(state))
+                {
+                    r.AppendLine($"⚠️ {Path.GetFileName(path)}: a second {state} clip. Skipped.");
+                    continue;
+                }
                 // In Place check: a clip that travels will make the character slide or snap back.
                 if (clip.isHumanMotion && new Vector3(clip.averageSpeed.x, 0f, clip.averageSpeed.z).magnitude > 0.2f)
+                {
                     r.AppendLine($"❌ {state} clip '{clip.name}' is not In Place: the character will slide. Re-download with In Place ticked.");
-                else
-                    r.AppendLine($"✅ {state}: {clip.name}" + (LoopingStates.Contains(state) ? " (looping)" : ""));
+                    clipsByState[state] = clip;
+                    continue;
+                }
+                // 3b. Fit the clip to the game's movement: the kit's jump leaves the ground at once,
+                // landing starts on touchdown, footsteps fire when a foot plants.
+                var feet = AnalyzeFeet(rig, rigAnimator, clip);
+                var fitted = imp.clipAnimations;
+                string fit = FitClip(state, feet, fitted[0], clip.frameRate);
+                if (fit != null)
+                {
+                    imp.clipAnimations = fitted;
+                    imp.SaveAndReimport();
+                    clip = AssetDatabase.LoadAllAssetsAtPath(path).OfType<AnimationClip>().First(a => !a.name.StartsWith("__preview"));
+                }
+                if ((state == "Walk" || state == "Run") && feet.stanceSpeed > 0.2f) clipSpeeds[state] = feet.stanceSpeed;
+                clipsByState[state] = clip;
+                r.AppendLine($"✅ {state}: {clip.name}" + (LoopingStates.Contains(state) ? " (looping)" : "") + (fit != null ? ", " + fit : ""));
+            }
+            }
+            finally
+            {
+                Object.DestroyImmediate(rig);
+            }
+
+            // States without a Mixamo clip would play the kit's empty placeholder and snap to T-pose: borrow a close match.
+            foreach (var fb in new[] { ("Victory", "Idle"), ("Hurt", "Land"), ("Death", "Idle") })
+            {
+                if (clipsByState.ContainsKey(fb.Item1) || !clipsByState.TryGetValue(fb.Item2, out var stand)) continue;
+                clipsByState[fb.Item1] = stand;
+                r.AppendLine($"⚠️ {fb.Item1}: no clip, using {stand.name} for now. Download a '{fb.Item1}' animation from Mixamo (In Place, Without Skin) for a real one.");
             }
 
             // 4. Animator Override Controller from JamHumanoid.controller; missing clips keep the kit's clips
@@ -210,10 +252,16 @@ namespace JamKit.EditorTools
                 var innerAnimator = charInst.GetComponent<Animator>();
                 if (innerAnimator != null) Object.DestroyImmediate(innerAnimator, true);
                 var animator = model.GetComponent<Animator>();
+                animator.enabled = true; // a switched-off Animator leaves the character frozen in T-pose
                 animator.avatar = avatar;
                 animator.runtimeAnimatorController = ov;
                 animator.applyRootMotion = false;
                 animator.Rebind();
+                var humanoid = inst.GetComponent<JamHumanoidAnimator>();
+                humanoid.walkClipSpeed = clipSpeeds.TryGetValue("Walk", out var ws) ? ws : 0f;
+                humanoid.runClipSpeed = clipSpeeds.TryGetValue("Run", out var rs) ? rs : 0f;
+                if (humanoid.walkClipSpeed > 0f)
+                    r.AppendLine($"✅ Feet synced to movement: walk clip {humanoid.walkClipSpeed:0.0} m/s" + (humanoid.runClipSpeed > 0f ? $", run clip {humanoid.runClipSpeed:0.0} m/s" : ""));
                 r.AppendLine(JamKitMenu.FitController(inst));
                 variantPath = $"{Generated}/{inst.name}.prefab";
                 PrefabUtility.SaveAsPrefabAsset(inst, variantPath);
@@ -254,6 +302,84 @@ namespace JamKit.EditorTools
             var go = AssetDatabase.LoadAssetAtPath<GameObject>(path);
             if (go == null) return 0;
             return go.GetComponentsInChildren<SkinnedMeshRenderer>(true).Sum(s => s.sharedMesh != null ? s.sharedMesh.vertexCount : 0);
+        }
+
+        /// <summary>Where the feet are over a clip: lift-off, touchdown, each foot plant, and how fast a planted foot slides back (= the speed the clip walks at).</summary>
+        class FootInfo
+        {
+            public float takeoff = -1f, touchdown = -1f, firstContact = -1f, stanceSpeed;
+            public readonly List<float> plants = new List<float>();
+        }
+
+        static FootInfo AnalyzeFeet(GameObject rig, Animator rigAnimator, AnimationClip clip)
+        {
+            var info = new FootInfo();
+            var feet = new[] { FootBone(rigAnimator, HumanBodyBones.LeftToes, HumanBodyBones.LeftFoot), FootBone(rigAnimator, HumanBodyBones.RightToes, HumanBodyBones.RightFoot) };
+            if (feet[0] == null || feet[1] == null || clip.length <= 0f) return info;
+            int n = Mathf.Max(2, Mathf.CeilToInt(clip.length * 60f));
+            float dt = clip.length / n, minY = float.MaxValue;
+            var pos = new Vector3[2, n + 1];
+            for (int i = 0; i <= n; i++)
+            {
+                clip.SampleAnimation(rig, i * dt);
+                for (int f = 0; f < 2; f++) { pos[f, i] = feet[f].position; minY = Mathf.Min(minY, pos[f, i].y); }
+            }
+            bool Down(int f, int i) => pos[f, i].y < minY + 0.03f;
+
+            float slide = 0f, stance = 0f;
+            bool wasAir = false;
+            for (int i = 0; i <= n; i++)
+            {
+                for (int f = 0; f < 2; f++)
+                {
+                    if (i > 0 && Down(f, i) && !Down(f, i - 1)) info.plants.Add(i * dt);
+                    if (i < n && Down(f, i) && Down(f, i + 1))
+                    {
+                        var d = pos[f, i] - pos[f, i + 1];
+                        slide += new Vector2(d.x, d.z).magnitude;
+                        stance += dt;
+                    }
+                }
+                bool air = !Down(0, i) && !Down(1, i);
+                if (air && !wasAir && i > 0 && info.takeoff < 0f) info.takeoff = i * dt;
+                if (!air && wasAir && info.touchdown < 0f) info.touchdown = i * dt;
+                if (!air && info.firstContact < 0f) info.firstContact = i * dt;
+                wasAir = air;
+            }
+            info.stanceSpeed = stance > 0f ? slide / stance : 0f;
+            return info;
+        }
+
+        static Transform FootBone(Animator a, HumanBodyBones toes, HumanBodyBones foot)
+        {
+            var t = a.GetBoneTransform(toes);
+            return t != null ? t : a.GetBoneTransform(foot);
+        }
+
+        /// <summary>Trims jump / land to the moments the feet leave and touch the ground, adds OnFootstep events to walk / run. Returns what changed, or null.</summary>
+        static string FitClip(string state, FootInfo feet, ModelImporterClipAnimation c, float fps)
+        {
+            float start = c.firstFrame / fps;
+            if (state == "Jump" && feet.takeoff > 0.15f)
+            {
+                // Skip the crouch wind-up: the kit's jump is airborne the frame you press the button.
+                float from = feet.takeoff - 0.1f, to = feet.touchdown > feet.takeoff ? feet.touchdown : c.lastFrame / fps - start;
+                c.firstFrame = (start + from) * fps;
+                c.lastFrame = (start + to) * fps;
+                return $"starts at take-off ({to - from:0.00} s)";
+            }
+            if (state == "Land" && feet.firstContact > 0.1f)
+            {
+                c.firstFrame = (start + feet.firstContact - 0.05f) * fps;
+                return "starts at touchdown";
+            }
+            if ((state == "Walk" || state == "Run") && feet.plants.Count > 0)
+            {
+                float length = c.lastFrame / fps - start;
+                c.events = feet.plants.Select(t => new AnimationEvent { functionName = "OnFootstep", time = Mathf.Clamp01(t / length) }).ToArray();
+                return $"{feet.plants.Count} footstep events";
+            }
+            return null;
         }
 
         static string StateFor(string fileName)

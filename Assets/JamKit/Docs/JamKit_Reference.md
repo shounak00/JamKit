@@ -1,6 +1,6 @@
 # JamKit v1.0 — Reference
 
-> **Generated from the code** by `JamKit → Internal → Export Reference Doc` on 2026-10-23 10:14 with Unity 6000.3.14f1.
+> **Generated from the code** by `JamKit → Internal → Export Reference Doc` on 2026-10-23 20:01 with Unity 6000.3.14f1.
 > This file is the source of truth for every component, field, event, menu, prefab and hierarchy name used in the slides and the cheat sheet. Do not edit by hand: regenerate it.
 
 ## Contents
@@ -152,6 +152,8 @@ Requires: `JamPlayerThirdPerson3D` (added automatically).
 |---|---|---|---|
 | `animator` (Animator) | Animator | None | The Animator on the Model child. Found automatically. |
 | `speedDamping` (Speed Damping) | float | 0.1 | Smoothing for the Speed parameter so the blend between idle, walk and run is soft. |
+| `walkClipSpeed` (Walk Clip Speed) | float | 0 | How fast the walk clip moves its feet, in metres per second. Setup Mixamo Character fills this in so the feet don't slide. 0 = play the clip at its normal speed. |
+| `runClipSpeed` (Run Clip Speed) | float | 0 | Same as Walk Clip Speed, for the run clip. |
 
 #### `JamPlayerPlatformer2D`
 
