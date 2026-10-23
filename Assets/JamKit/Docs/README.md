@@ -1,4 +1,4 @@
-# JamKit v1.0: No-Code Unity Starter Kit
+# JamKit v1.1: No-Code Unity Starter Kit
 
 Short version of `JamKit_CheatSheet.pdf`. Exact component, field and menu names are in `JamKit_Reference.md`.
 

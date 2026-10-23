@@ -1,6 +1,6 @@
-# JamKit v1.0 — Reference
+# JamKit v1.1 — Reference
 
-> **Generated from the code** by `JamKit → Internal → Export Reference Doc` on 2026-10-23 20:01 with Unity 6000.3.14f1.
+> **Generated from the code** by `JamKit → Internal → Export Reference Doc` on 2026-10-23 20:04 with Unity 6000.3.14f1.
 > This file is the source of truth for every component, field, event, menu, prefab and hierarchy name used in the slides and the cheat sheet. Do not edit by hand: regenerate it.
 
 ## Contents
@@ -610,8 +610,8 @@ A `PlayerConfig` asset holds all the feel numbers of a player. Drag one into the
 | `JamKit → Welcome Window` | Reopens the welcome window (shown automatically the first time the project opens). |
 | `JamKit → Internal → Rebuild Kit Content` | Kit maintainers only: regenerates every JamKit sprite, sound, tile, prefab, config and scene from code. |
 | `JamKit → Internal → Export Reference Doc` | Kit maintainers only: regenerates this file. |
-| `JamKit → Internal → Export Package` | Kit maintainers only: exports `JamKit_v1.0.unitypackage` (no Mixamo files, no Internal tools). |
-| `JamKit → Internal → Export Release Zip` | Kit maintainers only: zips the template project as `JamKit_Template_v1.0.zip` (no Library/Temp/Logs, no Mixamo files). |
+| `JamKit → Internal → Export Package` | Kit maintainers only: exports `JamKit_v1.1.unitypackage` (no Mixamo files, no Internal tools). |
+| `JamKit → Internal → Export Release Zip` | Kit maintainers only: zips the template project as `JamKit_Template_v1.1.zip` (no Library/Temp/Logs, no Mixamo files). |
 
 ## 6. Prefabs (`JamKit/Prefabs`)
 

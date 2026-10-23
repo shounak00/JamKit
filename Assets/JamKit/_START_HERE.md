@@ -1,4 +1,4 @@
-# Start here: JamKit v1.0
+# Start here: JamKit v1.1
 
 **Make a game without code.** The golden rule:
 

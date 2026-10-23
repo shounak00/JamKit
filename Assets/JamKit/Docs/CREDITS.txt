@@ -1,4 +1,4 @@
-JamKit v1.0 — Credits and licences
+JamKit v1.1 — Credits and licences
 ==================================
 
 Code

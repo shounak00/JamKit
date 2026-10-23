@@ -11,7 +11,7 @@ namespace JamKit.EditorTools
     public static class JamKitMenu
     {
         public const string Root = "Assets/JamKit";
-        public const string Version = "1.0";
+        public const string Version = "1.1";
         public const string RepoUrl = "https://github.com/shounak00/JamKit";
 
         // ------------------------------------------------------------------ New Level
