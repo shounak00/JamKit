@@ -114,7 +114,7 @@ namespace JamKit.EditorTools
             charImp.materialImportMode = ModelImporterMaterialImportMode.ImportViaMaterialDescription;
             charImp.SaveAndReimport();
             string texFolder = Generated + "/Textures";
-            Internal.JamKitBuilder.EnsureFolder(texFolder);
+            JamEditorUtil.EnsureFolder(texFolder);
             try { charImp.ExtractTextures(texFolder); } catch { /* no embedded textures */ }
             AssetDatabase.Refresh();
             charImp.SaveAndReimport();
@@ -168,9 +168,9 @@ namespace JamKit.EditorTools
             }
 
             // 4. Animator Override Controller from JamHumanoid.controller; missing clips keep the kit's clips
-            var baseCtrl = AssetDatabase.LoadAssetAtPath<AnimatorController>(Internal.JamKitBuilder.ControllerPath);
-            if (baseCtrl == null) return r.AppendLine("❌ JamHumanoid.controller missing. Run JamKit → Internal → Rebuild Kit Content.").ToString();
-            Internal.JamKitBuilder.EnsureFolder(Generated);
+            var baseCtrl = AssetDatabase.LoadAssetAtPath<AnimatorController>(JamEditorUtil.ControllerPath);
+            if (baseCtrl == null) return r.AppendLine("❌ JamHumanoid.controller missing. Re-import the JamKit package.").ToString();
+            JamEditorUtil.EnsureFolder(Generated);
             string overridePath = $"{Generated}/JamHumanoid_{charName}.overrideController";
             var ov = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(overridePath);
             if (ov == null)

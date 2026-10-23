@@ -155,7 +155,7 @@ namespace JamKit.EditorTools
                     ok = rendererExists,
                     label = is3D ? "3D renderer available (URP renderer index 1)" : "2D renderer available (URP renderer index 0)",
                     detail = rendererExists ? null : "The URP asset is missing a renderer. Fix adds a 2D renderer at 0 and a Universal (3D) renderer at 1.",
-                    fix = () => Internal.JamKitBuilder.SetupRenderers()
+                    fix = () => JamEditorUtil.SetupRenderers()
                 });
                 var so = new SerializedObject(data);
                 int current = so.FindProperty("m_RendererIndex").intValue;

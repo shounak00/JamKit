@@ -1,6 +1,6 @@
 # JamKit v1.0 — Reference
 
-> **Generated from the code** by `JamKit → Internal → Export Reference Doc` on 2026-10-17 02:19 with Unity 6000.3.14f1.
+> **Generated from the code** by `JamKit → Internal → Export Reference Doc` on 2026-10-23 10:14 with Unity 6000.3.14f1.
 > This file is the source of truth for every component, field, event, menu, prefab and hierarchy name used in the slides and the cheat sheet. Do not edit by hand: regenerate it.
 
 ## Contents
